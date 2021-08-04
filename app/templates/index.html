@@ -1,0 +1,92 @@
+<html>
+    <head>
+        <title>SQL-TO-SNOW</title>
+        <link
+          href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.css"
+          rel="stylesheet"
+        />
+    </head>
+    <body>
+        <div class="container">
+            <br>
+            <h1>- SQL to SNOW -</h1>
+            <form>
+              <!-- Message input -->
+              <div class="form-outline mb-4">
+                <textarea class="form-control"
+                          id="sqlQuery"
+                          rows="15"
+                          placeholder="CREATE DATABASE IF NOT EXISTS test;
+
+CREATE TABLE table_1(
+    t_id INT(11) NOT NULL AUTO_INCREMENT,
+    name VARCHAR(20) UNIQUE,
+    description TEXT,
+
+    PRIMARY KEY (t_id)
+);
+
+CREATE TABLE table_2(
+    d_id INT(11) NOT NULL AUTO_INCREMENT,
+    t_id INT(11) NOT NULL,
+    description TEXT,
+
+    PRIMARY KEY (d_id),
+    FOREIGN KEY (d_id) REFERENCES table_1(t_id)
+);
+"></textarea>
+                <label class="form-label" for="sqlQuery">Input Sql Query</label>
+              </div>
+
+            <!-- Submit button -->
+            <button type="button"
+                    id="convert_it"
+                    onclick="send_sql();"
+                    class="btn btn-primary btn-block mb-4">
+                Convert Sql to Snow
+            </button>
+
+            <!-- Message input -->
+            <div class="form-outline mb-4" >
+                <textarea class="form-control" id="snowQuery" rows="5"></textarea>
+            </div>
+        </form>
+        <hr>
+        </div>
+
+        <center>
+            by <a href="https://github.com/sanix-darker">darker</a>
+        </center>
+
+        <!-- MDB -->
+        <script
+          type="text/javascript"
+          src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.js"
+        ></script>
+        <script type="text/javascript">
+            const send_sql = async () => {
+              document.getElementById("convert_it").value = "CONVERSION IN PROGRESS...."
+              const rawResponse = await fetch('/convert', {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                        sql_query: document.getElementById("sqlQuery").value
+                    })
+              });
+              const content = await rawResponse.json();
+
+              const regex = /\\n|\\r\\n|\\n\\r|\\r/g;
+              document.getElementById("snowQuery").value = `-- query_id : ${content.qid}\n`.replace(regex, '<br>')
+              document.getElementById("snowQuery").value += `-- elapsed_time : ${content.elapsed}s\n`.replace(regex, '<br>')
+              document.getElementById("snowQuery").value += `-- snow-query : \n\n`.replace(regex, '<br>')
+              document.getElementById("snowQuery").value += content.snow_query.replace(regex, '<br>');
+
+              document.getElementById("convert_it").value = "Convert Sql to Snow"
+              console.log(content);
+            }
+        </script>
+    </body>
+</html>
