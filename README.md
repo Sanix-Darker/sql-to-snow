@@ -6,7 +6,11 @@ am not the author of the function `make_snow` inside `./app/utils.py`,
 
 But like you have probably noticed, his version need to be run on a terminal with sql queries insides sql files...
 
-Not what i really wanted... so i wrapped everything inside a basic flask UI application, and i added some coul stuffs !
+Not what i really wanted... so i wrapped everything inside a basic flask UI application, and i added some coul stuffs, 
+like:
+- CSV to SQL
+- Async call/convertions
+- Friendly UI
 
 That's all, yeah, nothing special.
 
@@ -30,4 +34,5 @@ python3 -m app.main
 ```
 
 ## Author
-- darker
+
+- [darker](github.com/sanix-darker)
