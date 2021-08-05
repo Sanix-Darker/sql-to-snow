@@ -894,7 +894,7 @@ def write_line(sqlout, sql, comment):
     return
 
 
-def converter_box(sql_query: str):
+def converter_box_snow(sql_query: str):
     # setting incoming and outgoing queries
     qid = time.time()
     ff_in = str(qid) + "_input.sql"
@@ -914,27 +914,28 @@ def converter_box(sql_query: str):
     return qid, sql_query, snow_query
 
 
-def csv_sql():
-
-    def convert(value):
-        for type in [int, float]:
-            try:
-                return type(value)
-            except ValueError:
-                continue
-        # All other types failed it is a string
-        return value
-
-    def construct_string_sql(file_path, table_name, schema_name):
-        string_SQL = ''
+def convert_f(value):
+    for type in [int, float]:
         try:
-            with open(file_path, 'r') as file:
-                reader = csv.reader(file)
-                headers = ','.join(next(reader))
-                for row in reader:
-                    row = [convert(x) for x in row].__str__()[1:-1]
-                    string_SQL += f'INSERT INTO {schema_name}.{table_name}({headers}) VALUES ({row});'
-        except:
-            return ''
+            return type(value)
+        except ValueError:
+            continue
+    # All other types failed it is a string
+    return value
 
-        return string_SQL
+
+def converter_box_sql(file_path, schema_name="data_db"):
+    qid = time.time()
+    table_name = file_path.replace(".", "_").replace("/", "__")
+    string_SQL = ''
+    try:
+        with open(file_path, 'r') as file:
+            reader = csv.reader(file)
+            headers = ','.join(next(reader))
+            for row in reader:
+                row = [convert_f(x) for x in row].__str__()[1:-1]
+                string_SQL += f'INSERT INTO {schema_name}.{table_name}({headers}) VALUES ({row});\n'
+    except:
+        return ''
+
+    return qid, string_SQL

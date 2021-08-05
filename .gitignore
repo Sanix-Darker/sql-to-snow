@@ -1,5 +1,6 @@
 env
 *sql
+*csv
 *__pycache__
 .idea
 .vscode

@@ -3,7 +3,9 @@ from flask import Flask, request, render_template
 from flask_cors import CORS, cross_origin
 import time
 
-from app.utils import converter_box
+from werkzeug.utils import secure_filename
+
+from app.utils import converter_box_sql, converter_box_snow
 
 app = Flask(__name__)
 CORS(app, support_credentials=True)
@@ -23,7 +25,7 @@ def converter():
     start = time.time()
     (qid,
      sql_query,
-     snow_query) = converter_box(request.json["sql_query"])
+     snow_query) = converter_box_snow(request.json["sql_query"])
 
     elapsed = time.time() - start
 
@@ -40,16 +42,21 @@ def converter():
 @app.route('/convert-sql', methods=['POST'])  # To prevent Cors issues
 @cross_origin(supports_credentials=True)
 def converter2():
-    start = time.time()
-    qid, sql_query = converter_box(request.json["sql_query"])
+    response = {}
+    if request.method == 'POST':
+        f = request.files['file']
+        f.save(secure_filename(f.filename))
 
-    elapsed = time.time() - start
+        start = time.time()
+        qid, sql_query = converter_box_sql(f.filename)
 
-    response = {
-        "qid": qid,
-        "sql_query": sql_query,
-        "elapsed": elapsed
-    }
+        elapsed = time.time() - start
+
+        response = {
+            "qid": qid,
+            "sql_query": sql_query,
+            "elapsed": elapsed
+        }
 
     return response
 

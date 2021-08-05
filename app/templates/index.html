@@ -22,9 +22,9 @@
                 <!-- Submit button -->
             <button type="button"
                     id="convert_it0"
-                    onclick="convert_it();"
+                    onclick="send_csv();"
                     class="btn btn-warning btn-block mb-4">
-                Csv to Sql
+                Csv File to Sql
             </button>
 
               <!-- Message input -->
@@ -55,14 +55,14 @@ CREATE TABLE table_2(
               </div>
 
             <div class="row">
-                <div class="col-md">
-                    <button type="button"
-                            id="copy_content0"
-                            onclick="copy2();"
-                            class="btn col-md btn-secondary btn-block mb-4">
-                        Copy SQL Query
-                    </button>
-                </div>
+<!--                <div class="col-md">-->
+<!--                    <button type="button"-->
+<!--                            id="copy_content0"-->
+<!--                            onclick="copyToClipboard(document.getElementById('sqlQuery').value, $(this));"-->
+<!--                            class="btn col-md btn-secondary btn-block mb-4">-->
+<!--                        Copy SQL Query-->
+<!--                    </button>-->
+<!--                </div>-->
 
                 <div class="col-md">
                         <button type="button"
@@ -81,12 +81,11 @@ CREATE TABLE table_2(
                           id="snowQuery" rows="5"></textarea>
             </div>
 
-            <button type="button"
-                    id="copy_content"
-                    onclick="copy();"
-                    class="btn btn-block mb-4">
-                Copy SNOW Query
-            </button>
+<!--            <button type="button"-->
+<!--                    id="copy_content"-->
+<!--                    class="btn btn-block mb-4">-->
+<!--                Copy SNOW Query-->
+<!--            </button>-->
         </form>
         <hr>
         </div>
@@ -101,6 +100,21 @@ CREATE TABLE table_2(
           src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.6.0/mdb.min.js"
         ></script>
         <script type="text/javascript">
+            const copyToClipboard = (text, el) => {
+                var copyTest = document.queryCommandSupported('copy');
+
+                if (copyTest === true) {
+                    var copyTextArea = document.createElement("textarea");
+                    copyTextArea.value = text;
+                    document.body.appendChild(copyTextArea);
+                    copyTextArea.select();
+
+                    document.body.removeChild(copyTextArea);
+                } else {
+                    // Fallback if browser doesn't support .execCommand('copy')
+                    window.prompt("Copy to clipboard: Ctrl+C or Command+C, Enter", text);
+                }
+            }
             const send_sql = async () => {
               document.getElementById("convert_it").value = "CONVERSION IN PROGRESS...."
               const rawResponse = await fetch('/convert-snow', {
@@ -127,17 +141,24 @@ CREATE TABLE table_2(
 
             const send_csv = async () => {
                 const formData  = new FormData();
-
-                const fileInput = document.querySelector('#convert_it0') ;
-                const formData = new FormData();
-
+                const fileInput = document.querySelector('#csvFile') ;
                 formData.append('file', fileInput.files[0]);
 
               const response = await fetch("/convert-sql", {
                 method: 'POST',
                 body: formData
               });
+
+              const content = await response.json();
+
+              const regex = /\\n|\\r\\n|\\n\\r|\\r/g;
+              document.getElementById("sqlQuery").value = content.sql_query.replace(regex, '<br>');
+              console.log(content);
             }
+//            document.getElementById("copy_content").click = (function(){-->
+//                console.log(document.getElementById('snowQuery').value)-->
+//                copyToClipboard(document.getElementById('snowQuery').value, this);-->
+//            });-->
         </script>
     </body>
 </html>
