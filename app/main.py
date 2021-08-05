@@ -17,11 +17,10 @@ def index():
     return render_template("index.html")
 
 
-@app.route('/convert', methods=['POST'])  # To prevent Cors issues
+@app.route('/convert-snow', methods=['POST'])  # To prevent Cors issues
 @cross_origin(supports_credentials=True)
 def converter():
     start = time.time()
-
     (qid,
      sql_query,
      snow_query) = converter_box(request.json["sql_query"])
@@ -32,6 +31,23 @@ def converter():
         "qid": qid,
         "sql_query": sql_query,
         "snow_query": snow_query,
+        "elapsed": elapsed
+    }
+
+    return response
+
+
+@app.route('/convert-sql', methods=['POST'])  # To prevent Cors issues
+@cross_origin(supports_credentials=True)
+def converter2():
+    start = time.time()
+    qid, sql_query = converter_box(request.json["sql_query"])
+
+    elapsed = time.time() - start
+
+    response = {
+        "qid": qid,
+        "sql_query": sql_query,
         "elapsed": elapsed
     }
 

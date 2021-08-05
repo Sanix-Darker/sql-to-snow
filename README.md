@@ -1,7 +1,7 @@
 # SQL-query To SnowFlake-query
 
 This is a dump project i wrote just to not have to learn again the SnowFlake based DDL synthax,
-am not the author of the function inside `./app/utils.py`, 
+am not the author of the function `make_snow` inside `./app/utils.py`, 
 [tamiroze](https://gist.github.com/tamiroze/dc0bdd596ed2c6b70fe921061401e739) is !
 
 But like you have probably noticed, his version need to be run on a terminal with sql queries insides sql files...

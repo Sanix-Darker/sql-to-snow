@@ -7,15 +7,31 @@
         />
     </head>
     <body>
-        <div class="container">
+        <div class="container col-md-4">
             <br>
-            <h1>- SQL to SNOW -</h1>
+            <center>
+                <h2>- ANALYTICS -</h2>
+                <h1>- CSV to SQL / SQL to SNOW -</h1>
+            </center>
             <form>
+                <!-- Message input -->
+            <div class=" mb-4" >
+                <label class="form-label" for="csvFile">CSV file</label>
+                <input type="file" class="form-control" id="csvFile"/>
+            </div>
+                <!-- Submit button -->
+            <button type="button"
+                    id="convert_it0"
+                    onclick="convert_it();"
+                    class="btn btn-warning btn-block mb-4">
+                Csv to Sql
+            </button>
+
               <!-- Message input -->
               <div class="form-outline mb-4">
                 <textarea class="form-control"
                           id="sqlQuery"
-                          rows="15"
+                          rows="8"
                           placeholder="CREATE DATABASE IF NOT EXISTS test;
 
 CREATE TABLE table_1(
@@ -35,21 +51,42 @@ CREATE TABLE table_2(
     FOREIGN KEY (d_id) REFERENCES table_1(t_id)
 );
 "></textarea>
-                <label class="form-label" for="sqlQuery">Input Sql Query</label>
+                <label class="form-label" for="sqlQuery">SQL Query</label>
               </div>
 
-            <!-- Submit button -->
-            <button type="button"
-                    id="convert_it"
-                    onclick="send_sql();"
-                    class="btn btn-primary btn-block mb-4">
-                Convert Sql to Snow
-            </button>
+            <div class="row">
+                <div class="col-md">
+                    <button type="button"
+                            id="copy_content0"
+                            onclick="copy2();"
+                            class="btn col-md btn-secondary btn-block mb-4">
+                        Copy SQL Query
+                    </button>
+                </div>
+
+                <div class="col-md">
+                        <button type="button"
+                                id="convert_it"
+                                onclick="send_sql();"
+                                class="btn col-md btn-primary btn-block mb-4">
+                            Sql to Snow
+                        </button>
+                </div>
+            </div>
 
             <!-- Message input -->
             <div class="form-outline mb-4" >
-                <textarea class="form-control" id="snowQuery" rows="5"></textarea>
+                <textarea class="form-control"
+                          placeholder="Your generated SnowSQL query will be print here with some stats."
+                          id="snowQuery" rows="5"></textarea>
             </div>
+
+            <button type="button"
+                    id="copy_content"
+                    onclick="copy();"
+                    class="btn btn-block mb-4">
+                Copy SNOW Query
+            </button>
         </form>
         <hr>
         </div>
@@ -66,7 +103,7 @@ CREATE TABLE table_2(
         <script type="text/javascript">
             const send_sql = async () => {
               document.getElementById("convert_it").value = "CONVERSION IN PROGRESS...."
-              const rawResponse = await fetch('/convert', {
+              const rawResponse = await fetch('/convert-snow', {
                 method: 'POST',
                 headers: {
                   'Accept': 'application/json',
@@ -86,6 +123,20 @@ CREATE TABLE table_2(
 
               document.getElementById("convert_it").value = "Convert Sql to Snow"
               console.log(content);
+            }
+
+            const send_csv = async () => {
+                const formData  = new FormData();
+
+                const fileInput = document.querySelector('#convert_it0') ;
+                const formData = new FormData();
+
+                formData.append('file', fileInput.files[0]);
+
+              const response = await fetch("/convert-sql", {
+                method: 'POST',
+                body: formData
+              });
             }
         </script>
     </body>

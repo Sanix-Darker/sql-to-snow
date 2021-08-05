@@ -3,6 +3,7 @@
 import sys, time
 from os import system
 from app.regex_snow import *
+import csv
 
 
 # Convert source SQL to Snowflake SQL
@@ -911,3 +912,29 @@ def converter_box(sql_query: str):
     system(f"rm -rf {ff_in} {ff_out}")
 
     return qid, sql_query, snow_query
+
+
+def csv_sql():
+
+    def convert(value):
+        for type in [int, float]:
+            try:
+                return type(value)
+            except ValueError:
+                continue
+        # All other types failed it is a string
+        return value
+
+    def construct_string_sql(file_path, table_name, schema_name):
+        string_SQL = ''
+        try:
+            with open(file_path, 'r') as file:
+                reader = csv.reader(file)
+                headers = ','.join(next(reader))
+                for row in reader:
+                    row = [convert(x) for x in row].__str__()[1:-1]
+                    string_SQL += f'INSERT INTO {schema_name}.{table_name}({headers}) VALUES ({row});'
+        except:
+            return ''
+
+        return string_SQL
